@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>NyrxsAi | Iframe Integration</title>
+  <style>
+    body {
+      margin: 0;
+      background-color: #0a0a0a;
+      color: #fdd835;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 40px 20px;
+    }
+
+    h1 {
+      font-size: 2.5rem;
+      margin-bottom: 30px;
+      text-shadow: 0 0 10px #fdd835aa;
+    }
+
+    iframe {
+      width: 100%;
+      max-width: 1200px;
+      height: 800px;
+      border: none;
+      border-radius: 15px;
+      box-shadow: 0 0 40px rgba(253, 216, 53, 0.3);
+      transition: all 0.4s ease-in-out;
+    }
+
+    iframe:hover {
+      transform: scale(1.01);
+      box-shadow: 0 0 60px rgba(253, 216, 53, 0.6);
+    }
+
+    .footer {
+      margin-top: 40px;
+      color: #fdd835;
+      font-size: 1rem;
+      opacity: 0.7;
+    }
+
+    @media (max-width: 768px) {
+      iframe {
+        height: 600px;
+      }
+
+      h1 {
+        font-size: 2rem;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <h1>🔗 Accès à NyrxsAi intégré</h1>
+
+  <iframe 
+    src="https://nyx-ai-pulse-forge.lovable.app" 
+    allowfullscreen 
+    loading="lazy">
+  </iframe>
+
+  <div class="footer">
+    Site intégré via iframe – NyrxsAi | © 2025
+  </div>
+
+</body>
+</html>
