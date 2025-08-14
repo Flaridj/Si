@@ -1,26 +1,533 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8">
-  <title>Iframe Plein Écran</title>
-  <style>
-    html, body {
-      margin: 0;
-      padding: 0;
-      height: 100%;
-      overflow: hidden;
-    }
-    iframe {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      border: none;
-    }
-  </style>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>OSINT AI — Outil d'Intelligence & Grab Discord</title>
+<meta name="description" content="Outil IA pour OSINT avancé et gestion de communautés Discord : requêtes rapides pour tout retrouver sur une personne ou un serveur, grab de serveurs entiers." />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Urbanist:wght@300;500;700;900&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#070b11;
+    --bg-soft:#0b1220;
+    --grid:#0b1f3a;
+    --txt:#dbe6ff;
+    --muted:#8aa4d6;
+    --accent:#2de2e6;
+    --accent-2:#7c4dff;
+    --danger:#ff3b6e;
+    --ok:#3cff9e;
+    --glass:rgba(13,25,45,.6);
+    --shadow:0 0 12px rgba(45,226,230,.45), 0 0 32px rgba(124,77,255,.25);
+    --radius:18px;
+  }
+
+  /* Reset + Base */
+  *{box-sizing:border-box}
+  html,body{height:100%}
+  body{
+    margin:0; font-family:"Urbanist",system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Cantarell,"Helvetica Neue",Arial,sans-serif;
+    background: radial-gradient(1200px 800px at 80% -10%, rgba(124,77,255,.15), transparent 60%),
+                radial-gradient(900px 600px at -10% 20%, rgba(45,226,230,.12), transparent 60%),
+                var(--bg);
+    color:var(--txt); line-height:1.6; overflow-x:hidden;
+  }
+  a{color:var(--accent); text-decoration:none}
+  img{max-width:100%; display:block}
+
+  /* Animated cyber grid */
+  .grid-bg{
+    position:fixed; inset:0; z-index:-3; pointer-events:none;
+    background:
+      radial-gradient(1000px 600px at 50% -200px, rgba(45,226,230,.15), transparent 70%),
+      linear-gradient(transparent 70%, rgba(0,0,0,.35)),
+      repeating-linear-gradient(transparent, transparent 22px, rgba(124,77,255,.08) 23px, rgba(124,77,255,.08) 24px),
+      repeating-linear-gradient(90deg, transparent, transparent 22px, rgba(45,226,230,.08) 23px, rgba(45,226,230,.08) 24px),
+      radial-gradient(circle at 50% 120%, rgba(0,0,0,.6), rgba(0,0,0,.9));
+    animation:gridMove 18s linear infinite;
+  }
+  @keyframes gridMove{
+    0%{background-position:0 0,0 0,0 0,0 0,0 0}
+    100%{background-position:0 0,0 0,0 100px,100px 0,0 0}
+  }
+
+  /* Header */
+  header{
+    position:sticky; top:0; z-index:10;
+    backdrop-filter:saturate(1.4) blur(10px);
+    background:linear-gradient(180deg, rgba(7,11,17,.85), rgba(7,11,17,.45));
+    border-bottom:1px solid rgba(124,77,255,.18);
+  }
+  .nav{
+    max-width:1200px; margin:auto; padding:14px 20px; display:flex; align-items:center; gap:16px;
+  }
+  .brand{display:flex; align-items:center; gap:12px; font-weight:900; letter-spacing:.5px}
+  .brand .logo{
+    width:34px; height:34px; border-radius:10px; display:grid; place-items:center;
+    background: radial-gradient(circle at 30% 30%, var(--accent), #0ff);
+    box-shadow:0 0 12px rgba(45,226,230,.7), inset 0 0 18px rgba(255,255,255,.18);
+  }
+  .nav a.link{padding:8px 10px; color:var(--txt); opacity:.85}
+  .nav .spacer{flex:1}
+  .btn{
+    display:inline-grid; place-items:center; padding:10px 16px; border-radius:12px;
+    font-weight:700; letter-spacing:.3px; border:1px solid rgba(45,226,230,.35);
+    background:linear-gradient(180deg, rgba(45,226,230,.12), rgba(124,77,255,.12));
+    box-shadow:var(--shadow); transition:transform .2s ease, box-shadow .2s ease, filter .2s ease;
+  }
+  .btn:hover{transform:translateY(-2px); filter:brightness(1.15)}
+  .btn--ghost{background:transparent}
+
+  /* Hero */
+  .hero{max-width:1200px; margin:0 auto; padding:72px 20px 40px; display:grid; gap:40px; align-items:center}
+  @media(min-width:900px){ .hero{grid-template-columns:1.15fr .85fr; padding-top:92px} }
+  .eyebrow{color:var(--muted); letter-spacing:.25em; font-size:.85rem; text-transform:uppercase}
+  h1{margin:.2em 0 .4em; font-size:clamp(2rem, 3.6vw + 1rem, 4rem); line-height:1.05}
+  .hero p{font-size:1.1rem; color:#bcd3ff}
+  .cta{display:flex; gap:12px; flex-wrap:wrap; margin-top:18px}
+
+  /* 3D Cube */
+  .cube-wrap{
+    perspective:1000px; display:grid; place-items:center; height:360px; position:relative;
+    isolation:isolate;
+  }
+  .glow-ring{
+    position:absolute; inset:auto 0 -14px; margin:auto; width:75%; height:24px; filter:blur(12px);
+    background:radial-gradient(closest-side, rgba(45,226,230,.45), transparent 60%);
+    z-index:-1;
+  }
+  .cube{
+    position:relative; width:220px; height:220px; transform-style:preserve-3d;
+    animation:spin 16s linear infinite;
+  }
+  @keyframes spin{
+    0%{transform:rotateX(-18deg) rotateY(0deg)}
+    100%{transform:rotateX(-18deg) rotateY(360deg)}
+  }
+  .cube .face{
+    position:absolute; inset:0; display:grid; place-items:center; border-radius:16px;
+    background:linear-gradient(180deg, rgba(13,25,45,.8), rgba(13,25,45,.4));
+    border:1px solid rgba(124,77,255,.35);
+    box-shadow:inset 0 0 40px rgba(124,77,255,.18), 0 0 24px rgba(45,226,230,.25);
+    backdrop-filter:blur(6px);
+    font-weight:800; letter-spacing:.2em; text-transform:uppercase;
+    text-shadow:0 0 12px rgba(45,226,230,.7);
+  }
+  .f1{transform: translateZ(110px);}
+  .f2{transform: rotateY(90deg) translateZ(110px);}
+  .f3{transform: rotateY(180deg) translateZ(110px);}
+  .f4{transform: rotateY(-90deg) translateZ(110px);}
+  .f5{transform: rotateX(90deg) translateZ(110px);}
+  .f6{transform: rotateX(-90deg) translateZ(110px);}
+
+  /* Sections */
+  section{scroll-margin-top:80px}
+  .wrap{max-width:1200px; margin:auto; padding:40px 20px}
+  .grid{
+    display:grid; gap:20px;
+    grid-template-columns:repeat(12, 1fr);
+  }
+  .card{
+    grid-column: span 12; padding:22px; border-radius:var(--radius);
+    background:linear-gradient(180deg, rgba(13,25,45,.6), rgba(13,25,45,.35));
+    border:1px solid rgba(124,77,255,.2);
+    box-shadow:var(--shadow);
+    transform-style:preserve-3d; transform:translateZ(0);
+    transition:transform .12s ease, box-shadow .2s ease;
+  }
+  .card:hover{transform:translateY(-2px) rotateX(.6deg) rotateY(.6deg)}
+  .icon{
+    width:46px; height:46px; border-radius:12px; display:grid; place-items:center; margin-bottom:10px;
+    background: radial-gradient(circle at 35% 35%, var(--accent), #0ff);
+    box-shadow:0 0 12px rgba(45,226,230,.7), inset 0 0 18px rgba(255,255,255,.18);
+  }
+  .meta{color:var(--muted); font-size:.95rem}
+
+  @media(min-width:800px){
+    .span-6{grid-column: span 6}
+    .span-4{grid-column: span 4}
+    .span-8{grid-column: span 8}
+  }
+
+  /* Timeline */
+  .timeline{position:relative; padding-left:26px}
+  .timeline::before{
+    content:""; position:absolute; left:8px; top:0; bottom:0; width:2px; background:linear-gradient(var(--accent), var(--accent-2));
+    box-shadow:0 0 12px rgba(45,226,230,.6);
+  }
+  .tl-item{position:relative; margin:18px 0; padding-left:10px}
+  .tl-item::before{
+    content:""; position:absolute; left:-20px; top:8px; width:12px; height:12px; border-radius:50%;
+    background:var(--accent); box-shadow:0 0 0 3px rgba(45,226,230,.25), 0 0 12px rgba(45,226,230,.9);
+  }
+
+  /* Footer */
+  footer{
+    border-top:1px solid rgba(124,77,255,.18);
+    background:linear-gradient(180deg, rgba(7,11,17,.45), rgba(7,11,17,.85));
+    color:#a9c0f7;
+  }
+
+  /* Scroll reveal */
+  .reveal{opacity:0; transform:translateY(18px); transition:opacity .6s ease, transform .6s ease}
+  .reveal.in{opacity:1; transform:none}
+
+  /* Reduced motion */
+  @media (prefers-reduced-motion: reduce){
+    .cube{animation:none}
+    .grid-bg{animation:none}
+    .reveal{transition:none}
+  }
+</style>
 </head>
 <body>
-  <iframe src="https://wumi-freedom-chat.lovable.app" allowfullscreen></iframe>
+<div class="grid-bg" aria-hidden="true"></div>
+
+<header>
+  <nav class="nav" aria-label="Navigation principale">
+    <div class="brand">
+      <div class="logo" aria-hidden="true">
+        <!-- Simple shield SVG -->
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <path d="M12 2l8 4v6c0 5-3.5 8.5-8 10-4.5-1.5-8-5-8-10V6l8-4z" stroke="#021" fill="rgba(0,0,0,.25)"/>
+          <path d="M7 11l3 3 7-7" stroke="#fff" stroke-width="2" stroke-linecap="round" />
+        </svg>
+      </div>
+      OSINT AI
+    </div>
+    <a class="link" href="#services">Fonctionnalités</a>
+    <a class="link" href="#lab">Démo</a>
+    <a class="link" href="#processus">Processus</a>
+    <a class="link" href="#faq">FAQ</a>
+    <div class="spacer"></div>
+    <a class="btn btn--ghost" href="#contact">Acheter</a>
+  </nav>
+</header>
+
+<main>
+  <!-- HERO -->
+  <section class="hero" id="accueil">
+    <div>
+      <div class="eyebrow">OSINT IA & Grab Discord</div>
+      <h1>Trouve tout. En 10 secondes.<br/> Grab les communautés.</h1>
+      <p>
+        Notre IA OSINT fouille le web et les serveurs Discord pour extraire des infos critiques avec des requêtes particulières. Côté Discord, grab un serveur entier ou individuellement vers un autre serveur en un clin d'œil.
+      </p>
+      <div class="cta">
+        <a class="btn" href="#services">Voir les fonctionnalités</a>
+        <a class="btn btn--ghost" href="#contact" aria-label="Acheter l'accès">Acheter l'accès</a>
+      </div>
+      <p class="meta">Prix : 1 semaine 4€ • 1 mois 10€ • 1 an 30€ • Lifetime 60€</p>
+    </div>
+
+    <div class="cube-wrap" aria-hidden="true">
+      <div class="glow-ring"></div>
+      <div class="cube" id="cube">
+        <div class="face f1">Scan</div>
+        <div class="face f2">Query</div>
+        <div class="face f3">Grab</div>
+        <div class="face f4">Extract</div>
+        <div class="face f5">Analyze</div>
+        <div class="face f6">Export</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SERVICES -->
+  <section id="services" class="wrap">
+    <h2 class="reveal">Fonctionnalités clés</h2>
+    <div class="grid">
+      <article class="card span-4 reveal tilt">
+        <div class="icon" aria-hidden="true">🔍</div>
+        <h3>OSINT Avancé</h3>
+        <p>Retrouve tout sur quelqu'un en 10 secondes avec des requêtes particulières : adresses, mails, réseaux sociaux, etc.</p>
+        <p class="meta">Recherche deep web · Bases de données publiques</p>
+      </article>
+      <article class="card span-4 reveal tilt">
+        <div class="icon" aria-hidden="true">🛡️</div>
+        <h3>Analyse Discord</h3>
+        <p>Fouille un serveur Discord pour extraire messages, utilisateurs, liens, et plus avec des requêtes ciblées.</p>
+        <p class="meta">Scan channels · Metadata extraction</p>
+      </article>
+      <article class="card span-4 reveal tilt">
+        <div class="icon" aria-hidden="true">📥</div>
+        <h3>Grab Discord</h3>
+        <p>Grab un serveur Discord entier ou individuellement vers un autre serveur : messages, membres, fichiers.</p>
+        <p class="meta">Export complet · Migration automatisée</p>
+      </article>
+
+      <article class="card span-6 reveal tilt">
+        <div class="icon" aria-hidden="true">🧪</div>
+        <h3>Démo & Lab</h3>
+        <p>Teste des requêtes OSINT en temps réel et simule un grab de serveur Discord dans un environnement contrôlé.</p>
+      </article>
+      <article class="card span-6 reveal tilt">
+        <div class="icon" aria-hidden="true">💰</div>
+        <h3>Tarifs</h3>
+        <p>1 semaine : 4€ • 1 mois : 10€ • 1 an : 30€ • Lifetime : 60€</p>
+      </article>
+    </div>
+  </section>
+
+  <!-- LAB DEMO (Particles + terminal fake) -->
+  <section id="lab" class="wrap">
+    <h2 class="reveal">Démo OSINT — Visual</h2>
+    <div class="grid">
+      <div class="card span-8 reveal">
+        <canvas id="net" aria-label="Visualisation réseau" style="width:100%;height:360px;border-radius:12px;"></canvas>
+      </div>
+      <div class="card span-4 reveal">
+        <h3>Console</h3>
+        <pre id="term" style="margin:0; white-space:pre-wrap; max-height:320px; overflow:auto;">
+$ osint -query "nom:exemple email:*@gmail.com"
+$ discord-scan -server-id 123456789 -extract messages
+$ grab -full -from-server 123456789 -to-server 987654321
+$ osint -deep -target "pseudo:exemple"
+$ discord-grab -user-id 111222333 -export files
+$ query -advanced "site:discord.com user:exemple"
+        </pre>
+        <button class="btn" id="runDemo" aria-label="Lancer la démo">Lancer la démo</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- PROCESS -->
+  <section id="processus" class="wrap">
+    <h2 class="reveal">Processus d'utilisation</h2>
+    <div class="card reveal">
+      <ol class="timeline">
+        <li class="tl-item"><strong>Inscription & Paiement</strong> – Choisis ton plan : 1 semaine 4€, 1 mois 10€, etc.</li>
+        <li class="tl-item"><strong>Accès IA</strong> – Connecte-toi et configure tes requêtes OSINT ou grab Discord.</li>
+        <li class="tl-item"><strong>Requête OSINT</strong> – Lance une requête particulière pour retrouver infos en 10 secondes.</li>
+        <li class="tl-item"><strong>Scan Discord</strong> – Fouille un serveur pour extraire données utiles.</li>
+        <li class="tl-item"><strong>Grab Serveur</strong> – Grab entier ou individuellement vers un autre serveur.</li>
+        <li class="tl-item"><strong>Export & Analyse</strong> – Télécharge les résultats et renouvelle si besoin.</li>
+      </ol>
+    </div>
+  </section>
+
+  <!-- FAQ -->
+  <section id="faq" class="wrap">
+    <h2 class="reveal">FAQ</h2>
+    <div class="grid">
+      <details class="card span-6 reveal">
+        <summary><strong>L'OSINT, c’est quoi exactement ?</strong></summary>
+        <p>Intelligence open-source : fouille de données publiques pour retrouver tout sur quelqu'un ou un serveur en 10 secondes avec des requêtes particulières.</p>
+      </details>
+      <details class="card span-6 reveal">
+        <summary><strong>On peut grab un serveur Discord entier ?</strong></summary>
+        <p>Oui, grab complet ou individuellement vers un autre serveur, avec messages, fichiers, membres.</p>
+      </details>
+      <details class="card span-6 reveal">
+        <summary><strong>Quels livrables ?</strong></summary>
+        <p>Résultats en temps réel, exports JSON/CSV, rapports détaillés des grabs et scans OSINT.</p>
+      </details>
+      <details class="card span-6 reveal">
+        <summary><strong>Les tarifs sont-ils flexibles ?</strong></summary>
+        <p>Oui : 1 semaine 4€, 1 mois 10€, 1 an 30€, lifetime 60€. Paiement sécurisé.</p>
+      </details>
+    </div>
+  </section>
+
+  <!-- CONTACT -->
+  <section id="contact" class="wrap">
+    <h2 class="reveal">Contacte-nous</h2>
+    <form class="card reveal" id="contactForm" novalidate>
+      <div class="grid">
+        <label class="span-6">Nom
+          <input name="nom" required placeholder="Ton pseudo / nom" />
+        </label>
+        <label class="span-6">Email
+          <input type="email" name="email" required placeholder="contact@exemple.com" />
+        </label>
+        <label class="span-12">Message
+          <textarea name="msg" rows="4" required placeholder="Décris ton besoin : accès OSINT, grab Discord, plan d'abonnement…"></textarea>
+        </label>
+      </div>
+      <div style="display:flex; gap:12px; align-items:center; justify-content:space-between; flex-wrap:wrap">
+        <small class="meta">Nous répondons en 24h ouvrées.</small>
+        <button class="btn" type="submit">Envoyer</button>
+      </div>
+      <p id="formMsg" class="meta" role="status" aria-live="polite" style="margin-top:10px;"></p>
+    </form>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <div class="grid">
+      <div class="span-6">
+        <div class="brand" style="margin-bottom:8px">
+          <div class="logo" aria-hidden="true"></div> OSINT AI
+        </div>
+        <p>IA pour OSINT & Grab Discord. Paris • Remote EU.</p>
+      </div>
+      <div class="span-6" style="text-align:right">
+        <a class="link" href="#accueil">Haut de page ↑</a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<!-- Scripts -->
+<script>
+  // ---- Small helpers
+  const $ = (s,root=document)=>root.querySelector(s);
+  const $$ = (s,root=document)=>[...root.querySelectorAll(s)];
+
+  // ---- Scroll reveal
+  const io = new IntersectionObserver((entries)=>{
+    entries.forEach(e=>{
+      if(e.isIntersecting){ e.target.classList.add('in'); io.unobserve(e.target); }
+    })
+  }, {threshold:.15});
+  $$('.reveal').forEach(el=>io.observe(el));
+
+  // ---- Canvas particle network
+  (function(){
+    const c = document.getElementById('net');
+    const ctx = c.getContext('2d');
+    const DPR = Math.min(window.devicePixelRatio || 1, 2);
+    let W = c.clientWidth, H = c.clientHeight;
+    function resize(){
+      W = c.clientWidth; H = c.clientHeight;
+      c.width = W * DPR; c.height = H * DPR; ctx.scale(DPR,DPR);
+    }
+    resize(); window.addEventListener('resize', resize);
+
+    const N = 60;
+    const pts = Array.from({length:N}, ()=>({
+      x: Math.random()*W, y: Math.random()*H,
+      vx: (Math.random()-.5)*.6, vy:(Math.random()-.5)*.6
+    }));
+
+    function step(){
+      ctx.clearRect(0,0,W,H);
+      // draw links
+      for(let i=0;i<N;i++){
+        for(let j=i+1;j<N;j++){
+          const dx = pts[i].x - pts[j].x;
+          const dy = pts[i].y - pts[j].y;
+          const d2 = dx*dx + dy*dy;
+          if(d2 < 150*150){
+            const alpha = 1 - d2/(150*150);
+            ctx.beginPath();
+            ctx.moveTo(pts[i].x, pts[i].y);
+            ctx.lineTo(pts[j].x, pts[j].y);
+            ctx.strokeStyle = `rgba(45,226,230,${0.25*alpha})`;
+            ctx.lineWidth = 1;
+            ctx.stroke();
+          }
+        }
+      }
+      // draw points
+      for(const p of pts){
+        p.x += p.vx; p.y += p.vy;
+        if(p.x<0||p.x>W) p.vx*=-1;
+        if(p.y<0||p.y>H) p.vy*=-1;
+        ctx.beginPath();
+        ctx.arc(p.x,p.y,2,0,Math.PI*2);
+        ctx.fillStyle = 'rgba(124,77,255,.9)';
+        ctx.shadowColor = 'rgba(124,77,255,.8)';
+        ctx.shadowBlur = 8;
+        ctx.fill();
+        ctx.shadowBlur = 0;
+      }
+      requestAnimationFrame(step);
+    }
+    step();
+  })();
+
+  // ---- Fake terminal "demo" typing
+  (function(){
+    const btn = document.getElementById('runDemo');
+    const term = document.getElementById('term');
+    const lines = [
+      '$ whoami && hostname',
+      'user@osint-ai  core-server-01',
+      '$ osint -query "nom:exemple email:*@gmail.com" -> found 42 matches',
+      '$ discord-scan -server-id 123456789 -extract messages :: 5000+ items',
+      '$ grab -full -from-server 123456789 -to-server 987654321',
+      '$ osint -deep -target "pseudo:exemple" -> deep links extracted'
+    ];
+    let running = false;
+    btn.addEventListener('click', ()=>{
+      if(running) return;
+      running = true; term.textContent = ''; let i=0;
+      const tick = () => {
+        if(i>=lines.length){ running=false; return; }
+        typeLine(lines[i++], tick);
+      };
+      tick();
+    });
+    function typeLine(text, done){
+      let i=0;
+      const id=setInterval(()=>{
+        term.textContent += text[i++] || '';
+        term.scrollTop = term.scrollHeight;
+        if(i > text.length){ clearInterval(id); term.textContent += "\n"; setTimeout(done, 200); }
+      }, 12);
+    }
+  })();
+
+  // ---- Tilt effect on cards
+  $$('.tilt').forEach(card=>{
+    let rAF = null;
+    const rect = ()=>card.getBoundingClientRect();
+    const onMove = (e)=>{
+      if(rAF) return;
+      rAF = requestAnimationFrame(()=>{
+        rAF = null;
+        const b = rect();
+        const cx = b.left + b.width/2;
+        const cy = b.top + b.height/2;
+        const dx = (e.clientX - cx) / (b.width/2);
+        const dy = (e.clientY - cy) / (b.height/2);
+        card.style.transform = `translateY(-2px) rotateX(${(-dy*4).toFixed(2)}deg) rotateY(${(dx*6).toFixed(2)}deg)`;
+        card.style.boxShadow = `0 10px 30px rgba(0,0,0,.35), 0 0 22px rgba(45,226,230,.25)`;
+      });
+    };
+    const reset = ()=>{
+      card.style.transform='translateY(0) rotateX(0) rotateY(0)';
+      card.style.boxShadow='var(--shadow)';
+    };
+    card.addEventListener('mousemove', onMove);
+    card.addEventListener('mouseleave', reset);
+    card.addEventListener('blur', reset);
+  });
+
+  // ---- Simple form validation (client-side)
+  (function(){
+    const form = document.getElementById('contactForm');
+    const msg = document.getElementById('formMsg');
+    form.addEventListener('submit', (e)=>{
+      e.preventDefault();
+      const data = new FormData(form);
+      const nom = (data.get('nom')||'').trim();
+      const email = (data.get('email')||'').trim();
+      const text = (data.get('msg')||'').trim();
+      if(!nom || !email || !text){
+        msg.textContent = 'Merci de compléter tous les champs requis.'; msg.style.color = '#ff9bb3'; return;
+      }
+      if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){
+        msg.textContent = 'Email invalide.'; msg.style.color = '#ff9bb3'; return;
+      }
+      // Fake success
+      msg.textContent = 'Reçu. On revient vers toi avec un accès sous peu.'; msg.style.color = '#3cff9e';
+      form.reset();
+    });
+  })();
+
+  // ---- Enhance inputs
+  $$('input, textarea').forEach(el=>{
+    el.style.width='100%'; el.style.marginTop='6px'; el.style.padding='12px 14px';
+    el.style.borderRadius='12px'; el.style.background='rgba(10,18,32,.6)';
+    el.style.border='1px solid rgba(124,77,255,.25)';
+    el.style.color='var(--txt)'; el.style.outline='none';
+    el.addEventListener('focus', ()=>{ el.style.boxShadow='0 0 0 3px rgba(45,226,230,.25)'; });
+    el.addEventListener('blur', ()=>{ el.style.boxShadow='none'; });
+  });
+</script>
 </body>
 </html>
