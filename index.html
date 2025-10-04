@@ -1,26 +1,29 @@
-
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8">
-  <title>Intégration du site</title>
-  <style>
-    body {
-      margin: 0;
-      padding: 0;
-    }
-    iframe {
-      width: 100vw;
-      height: 100vh;
-      border: none;
-    }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Iframe pleine page</title>
+<style>
+  /* On supprime les marges et padding du body pour que l'iframe prenne tout l'espace */
+  html, body {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    overflow: hidden;
+  }
+
+  /* L'iframe prendra toute la largeur et la hauteur */
+  iframe {
+    border: none;
+    width: 100%;
+    height: 100%;
+  }
+</style>
 </head>
 <body>
-  <iframe 
-    src="https://duel-flood-arena.lovable.app" 
-    title="Seyo Discord Site Builder"
-    allowfullscreen>
-  </iframe>
+
+<iframe src="https://darkglow-ai-chat.lovable.app" title="DarkGlow AI Chat"></iframe>
+
 </body>
 </html>
