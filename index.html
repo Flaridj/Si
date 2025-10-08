@@ -1,27 +1,147 @@
-   transition: all 0.3s ease;
-            box-shadow: var(--neon-glow);
-        }
-        
-        .buy-link:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 0 20px rgba(220, 38, 38, 0.6);
-        }
-        
-        .logo-container {
-            position: relative;
-            display: flex;
-            justify-content: center;
-            width: 100%;
-            margin-bottom: 45px;
-        }
+   <!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Iframe plein écran — Chat Magic Codes</title>
+  <style>
+    html, body {
+      height: 100%;
+      margin: 0;
+      background: #000;
+      overflow: hidden; /* évite scroll du body */
+      font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+    }
 
-        @keyframes containerAppear {
-            from {
-                opacity: 0;
-                transform: scale(0.95);
-            }
-            to {
-                opacity: 1;
-                transform: scale(1);
-            }
-        
+    /* Conteneur pour le bouton (optionnel) */
+    .controls {
+      position: fixed;
+      right: 12px;
+      top: 12px;
+      z-index: 1000001;
+      display: flex;
+      gap: 8px;
+    }
+    .btn {
+      background: rgba(255,255,255,0.9);
+      color: #111;
+      border: 0;
+      padding: 8px 12px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: 600;
+    }
+    .btn:active { transform: translateY(1px); }
+
+    /* L'iframe prend tout l'écran */
+    #chatFrame {
+      position: fixed;
+      inset: 0;          /* top:0; right:0; bottom:0; left:0; */
+      width: 100%;
+      height: 100%;
+      border: none;
+      margin: 0;
+      padding: 0;
+      display: block;
+      z-index: 1000000;
+      background: #fff;
+    }
+
+    /* Message d'erreur si l'iframe est bloquée (affiché si l'iframe ne charge pas) */
+    #blocked {
+      position: absolute;
+      inset: 0;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      background: rgba(0,0,0,0.7);
+      text-align: center;
+      padding: 20px;
+      z-index: 1000010;
+    }
+    #blocked.show { display: flex; }
+  </style>
+</head>
+<body>
+  <!-- Boutons : entrer en plein écran (utile pour mobile/desktop) et recharger -->
+  <div class="controls" role="region" aria-label="Contrôles">
+    <button class="btn" id="fsBtn">Entrer en plein écran</button>
+    <button class="btn" id="reloadBtn">Recharger iframe</button>
+  </div>
+
+  <!-- Iframe plein écran -->
+  <iframe
+    id="chatFrame"
+    src="https://chat-magic-codes.lovable.app/chat"
+    title="Chat Magic Codes"
+    allow="fullscreen; microphone; camera; autoplay; clipboard-read; clipboard-write"
+    allowfullscreen
+    sandbox="allow-scripts allow-same-origin allow-forms allow-modals"
+  ></iframe>
+
+  <!-- Message si le site bloque l'affichage en iframe -->
+  <div id="blocked" role="alert">
+    <div>
+      <h2>Impossible d’afficher le contenu</h2>
+      <p>
+        Le site cible bloque probablement l’affichage en iframe (en-têtes <code>X-Frame-Options</code> ou politique CSP).
+        Ouvrez directement ce lien : <a href="https://chat-magic-codes.lovable.app/chat" target="_blank" rel="noopener">Ouvrir Chat Magic Codes</a>
+      </p>
+    </div>
+  </div>
+
+  <script>
+    const iframe = document.getElementById('chatFrame');
+    const fsBtn = document.getElementById('fsBtn');
+    const reloadBtn = document.getElementById('reloadBtn');
+    const blocked = document.getElementById('blocked');
+
+    /* Fonction pour demander le plein écran pour l'iframe */
+    async function requestFrameFullscreen() {
+      try {
+        if (iframe.requestFullscreen) {
+          await iframe.requestFullscreen();
+        } else if (iframe.webkitRequestFullscreen) { /* Safari */
+          await iframe.webkitRequestFullscreen();
+        } else if (iframe.msRequestFullscreen) { /* IE11 */
+          await iframe.msRequestFullscreen();
+        } else {
+          alert("Votre navigateur ne supporte pas l'API Fullscreen.");
+        }
+      } catch (err) {
+        console.error("Erreur fullscreen:", err);
+      }
+    }
+
+    fsBtn.addEventListener('click', requestFrameFullscreen);
+
+    /* Rechargement manuel de l'iframe */
+    reloadBtn.addEventListener('click', () => {
+      iframe.src = iframe.src;
+    });
+
+    /* Détecter si l'iframe a été bloquée par X-Frame-Options/CSP.
+       Ce test simple attend un court délai : si l'iframe n'a pas émis "load" => possible blocage.
+       Note : ce n'est pas parfait mais utile dans la plupart des cas. */
+    let loaded = false;
+    iframe.addEventListener('load', () => {
+      loaded = true;
+      blocked.classList.remove('show');
+    });
+
+    // Si après 3s pas de load -> afficher message (signale possible blocage)
+    setTimeout(() => {
+      if (!loaded) {
+        blocked.classList.add('show');
+        console.warn("L'iframe n'a pas chargé : vérifier X-Frame-Options ou CSP du site cible.");
+      }
+    }, 3000);
+
+    /* Astuce : si vous voulez forcer le style pour éviter scrolls internes :
+       vous pouvez injecter CSS côté site embarqué (si vous contrôlez le domaine) :
+       html, body { height:100%; margin:0; overflow:hidden; }
+    */
+  </script>
+</body>
+</html>
