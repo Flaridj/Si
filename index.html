@@ -1,28 +1,27 @@
-<!
-  .menu button {
-    padding: 8px 12px;
-    margin-right: 5px;
-    font-size: 14px;
-    cursor: pointer;
-  }
-</style>
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chat Magic Codes Plein Écran</title>
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      overflow: hidden;
+    }
+    iframe {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      border: none;
+    }
+  </style>
 </head>
 <body>
-
-<div class="menu">
-  <button onclick="loadPage('/chat')">Chat</button>
-  <button onclick="loadPage('/admin')">Admin</button>
-  <button onclick="loadPage('/settings')">Settings</button>
-</div>
-
-<iframe id="siteFrame" src="https://chat-magic-codes.lovable.app/chat" allowfullscreen></iframe>
-
-<script>
-function loadPage(path) {
-  const iframe = document.getElementById('siteFrame');
-  iframe.src = 'https://chat-magic-codes.lovable.app' + path;
-}
-</script>
-
+  <iframe src="https://chat-magic-codes.lovable.app/chat" allowfullscreen></iframe>
 </body>
 </html>
