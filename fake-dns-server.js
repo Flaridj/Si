@@ -1,46 +1,111 @@
-const dns2 = require('dns2');  // Bibliothèque pour gérer le serveur DNS
-
-const server = dns2.createServer({
-  udp: true,
-  tcp: true,
-  handle: (request, response) => {
-    const questions = request.questions;
-    
-    questions.forEach(question => {
-      const domain = question.name.toLowerCase();
-      const type = question.type;
-      
-      if (domain === '_discord.mcdonalds.fr.' && type === 'TXT') {
-        response.answer.push({
-          name: domain,
-          type: dns2.Packet.TYPE.TXT,
-          class: dns2.Packet.CLASS.IN,
-          ttl: 300,
-          data: 'dh=22a53ba0b9bdbdc9326de5510b56632254b8c4ea'
-        });
-      } else {
-        response.header.rcode = dns2.Packet.RCODE.NOERROR;
-      }
-      
-      response.header.qr = 1;
-      response.header.aa = 1;
-    });
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Synthwave Altitude — Plein écran</title>
+<style>
+  html, body {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    overflow: hidden;
+    background-color: #050510;
+    color: #fff;
+    font-family: 'Inter', sans-serif;
   }
-});
 
-server.on('request', (request, response) => {
-  console.log('Requête DNS reçue:', request.questions[0]?.name || 'Inconnu');
-  server.send(response);
-});
+  #container {
+    position: relative;
+    width: 100%;
+    height: 100%;
+  }
 
-server.on('error', (error) => {
-  console.error('Erreur du serveur DNS:', error.message);  // Amélioré pour mobile, avec message court
-});
+  iframe {
+    border: none;
+    width: 100%;
+    height: 100%;
+  }
 
-// Lance sur un port plus safe pour mobile, comme 5353 pour éviter les conflits
-const port = 5353;  // Changeable si needed
-server.listen(port, '0.0.0.0').then(() => {
-  console.log(`Serveur DNS fake lancé sur le port ${port}. Redirige tes requêtes DNS vers ici.`);
-}).catch((err) => {
-  console.error('Échec du lancement du serveur:', err);  // Gestion d'erreur pour permissions
-});
+  #fullscreen-btn {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    z-index: 9999;
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    border-radius: 6px;
+    padding: 10px 18px;
+    color: #00ffe7;
+    font-size: 15px;
+    cursor: pointer;
+    backdrop-filter: blur(6px);
+    transition: all 0.2s ease;
+  }
+
+  #fullscreen-btn:hover {
+    background: rgba(0, 255, 231, 0.2);
+  }
+
+  #fallback {
+    display: none;
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(circle at 20% 30%, #1a0033, #000);
+    text-align: center;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    font-size: 18px;
+  }
+
+  #fallback a {
+    margin-top: 10px;
+    padding: 10px 20px;
+    background: #00ffe7;
+    color: #000;
+    border-radius: 6px;
+    text-decoration: none;
+    font-weight: bold;
+  }
+
+  #fallback a:hover {
+    background: #00c4b7;
+  }
+</style>
+</head>
+<body>
+
+<div id="container">
+  <iframe id="gameFrame" src="https://synthwave-altitude.lovable.app" allowfullscreen></iframe>
+  <button id="fullscreen-btn">⛶ Plein écran</button>
+  <div id="fallback">
+    <p>Ce site ne permet pas l’intégration en plein écran.</p>
+    <a href="https://synthwave-altitude.lovable.app" target="_blank">Ouvrir dans un nouvel onglet</a>
+  </div>
+</div>
+
+<script>
+  const iframe = document.getElementById('gameFrame');
+  const fallback = document.getElementById('fallback');
+  const btn = document.getElementById('fullscreen-btn');
+
+  // Vérifie si l’iframe charge correctement
+  iframe.addEventListener('error', () => {
+    iframe.style.display = 'none';
+    fallback.style.display = 'flex';
+  });
+
+  // Bouton plein écran
+  btn.addEventListener('click', () => {
+    const elem = document.documentElement;
+    if (!document.fullscreenElement) {
+      elem.requestFullscreen().catch(err => console.warn(err));
+    } else {
+      document.exitFullscreen();
+    }
+  });
+</script>
+
+</body>
+</html>
