@@ -1,34 +1,53 @@
-<!-- IFRAME -->
-<div class="embed-wrapper" style="max-width:900px;">
-  <iframe
-    src="https://cryai-coder-buddy.lovable.app/chat"
-    title="CryAI Coder Buddy"
-    width="100%"
-    height="600"
-    frameborder="0"
-    loading="lazy"
-    sandbox="allow-forms allow-scripts allow-same-origin allow-popups"
-  ></iframe>
-
-  <!-- DISCLAIMER -->
-  <p class="ai-disclaimer small">
-    ⚠️ Il s’agit d’un petit bug connu : il est possible que l’IA génère du code contenant du HTML, CSS, en plus du langage principal.  
-    Ce n’est pas grave — copiez simplement le code, et le HTML disparaît lors de votre copier-coller.
-  </p>
-</div>
-
-<!-- CSS minimal -->
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CryAI Coder Buddy Fullscreen</title>
 <style>
-  .ai-disclaimer.small {
-    font-size: 12px;        /* petit texte */
-    color: #6b6b6b;         /* gris discret */
-    margin: 8px 0 0;        /* petit espace au-dessus */
+  html, body {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    overflow: hidden; /* empêche le scroll général */
     font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
-    line-height: 1.3;
   }
-  .embed-wrapper iframe {
+
+  /* iframe prend tout l'écran */
+  iframe {
+    width: 100%;
+    height: 100%;
+    border: none;
     display: block;
-    border-radius: 6px;
-    overflow: hidden;
+  }
+
+  /* texte fixe en bas */
+  .ai-disclaimer {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    background-color: rgba(255,255,255,0.9); /* fond légèrement translucide */
+    color: #333;
+    font-size: 14px;
+    padding: 8px 12px;
+    box-shadow: 0 -2px 6px rgba(0,0,0,0.1);
+    z-index: 9999;
   }
 </style>
+</head>
+<body>
+
+<iframe
+  src="https://cryai-coder-buddy.lovable.app/chat"
+  title="CryAI Coder Buddy"
+  sandbox="allow-forms allow-scripts allow-same-origin allow-popups"
+></iframe>
+
+<p class="ai-disclaimer">
+⚠️ Il s’agit d’un petit bug connu : il est possible que l’IA génère du code contenant du HTML, CSS, en plus du langage principal.  
+Ce n’est pas grave — copiez simplement le code, et le HTML disparaît lors de votre copier-coller.
+</p>
+
+</body>
+</html>
