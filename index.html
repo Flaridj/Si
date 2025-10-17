@@ -1,53 +1,27 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>CryAI Coder Buddy Fullscreen</title>
-<style>
-  html, body {
-    margin: 0;
-    padding: 0;
-    height: 100%;
-    overflow: hidden; /* empêche le scroll général */
-    font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
-  }
-
-  /* iframe prend tout l'écran */
-  iframe {
-    width: 100%;
-    height: 100%;
-    border: none;
-    display: block;
-  }
-
-  /* texte fixe en bas */
-  .ai-disclaimer {
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    width: 100%;
-    background-color: rgba(255,255,255,0.9); /* fond légèrement translucide */
-    color: #333;
-    font-size: 14px;
-    padding: 8px 12px;
-    box-shadow: 0 -2px 6px rgba(0,0,0,0.1);
-    z-index: 9999;
-  }
-</style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>IFrame Plein Écran</title>
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      overflow: hidden;
+    }
+    iframe {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      border: none;
+    }
+  </style>
 </head>
 <body>
-
-<iframe
-  src="https://cryai-coder-buddy.lovable.app/chat"
-  title="CryAI Coder Buddy"
-  sandbox="allow-forms allow-scripts allow-same-origin allow-popups"
-></iframe>
-
-<p class="ai-disclaimer">
-⚠️ Il s’agit d’un petit bug connu : il est possible que l’IA génère du code contenant du HTML, CSS, en plus du langage principal.  
-Ce n’est pas grave — copiez simplement le code, et le HTML disparaît lors de votre copier-coller.
-</p>
-
+  <iframe src="https://exemple.com" allowfullscreen></iframe>
 </body>
 </html>
