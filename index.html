@@ -3,25 +3,37 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>IFrame Plein Écran</title>
+  <title>OSINT Arena — Auth</title>
   <style>
+    /* Page full-screen et iframe */
     html, body {
       margin: 0;
       padding: 0;
       height: 100%;
-      overflow: hidden;
+      background: linear-gradient(180deg, #041027 0%, #07172a 100%);
+      font-family: Inter, system-ui, sans-serif;
     }
+
+    .iframe-container {
+      width: 100%;
+      height: 100%;
+      position: relative;
+    }
+
     iframe {
-      position: absolute;
-      top: 0;
-      left: 0;
       width: 100%;
       height: 100%;
       border: none;
+      display: block;
     }
   </style>
 </head>
 <body>
-  <iframe src="https://nyr-creative-services.lovable.app" allowfullscreen></iframe>
+  <div class="iframe-container">
+    <iframe src="https://osint-arena-web.lovable.app/auth" title="OSINT Arena Auth"></iframe>
+  </div>
+
+  <!-- Inclut ton script anti-devtools -->
+  <script src="script.js"></script>
 </body>
 </html>
