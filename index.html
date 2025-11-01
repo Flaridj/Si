@@ -1,1 +1,26 @@
-<!DOCTYPE html><html lang="fr"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>FameArena</title><style>*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}html,body,#a{width:100%;height:100%;overflow:hidden}#a{border:none}</style></head><body><div id="a"></div><script>(function(){'use strict';var _0x4e=['aHR0cHM6Ly9mYW1lLWNhcmQtYXJlbmEubG92YWJsZS5hcHAv','Y3JlYXRlRWxlbWVudA==','aWZyYW1l','c3Jj','YXBwZW5kQ2hpbGQ=','Z2V0RWxlbWVudEJ5SWQ=','YWxsb3dmdWxsc2NyZWVu','c2V0QXR0cmlidXRl','YWRkRXZlbnRMaXN0ZW5lcg==','a2V5ZG93bg==','cHJldmVudERlZmF1bHQ=','Y29udGV4dG1lbnU=','c2VsZWN0c3RhcnQ=','ZHJhZ3N0YXJ0','b3V0ZXJIZWlnaHQ=','aW5uZXJIZWlnaHQ=','b3V0ZXJXaWR0aA==','aW5uZXJXaWR0aA==','cmVsb2Fk','YWxlcnQ=','QWNjZXMgaW50ZXJkaXQh','c2V0SW50ZXJ2YWw='];(function(_0x5d,_0x4e){var _0x3a=function(_0x5d){while(--_0x5d){_0x5d['push'](_0x5d['shift']());}};_0x3a(++_0x4e);}(_0x4e,0x12d));var _0x5d=function(_0x4e,_0x3a){_0x4e=_0x4e-0x0;var _0x5d=_0x4e[_0x4e];return _0x5d;};var _0x3a=atob(_0x5d('0x0'));var _0x12=document[_0x5d('0x1')](_0x5d('0x2'));_0x12[_0x5d('0x7')](_0x5d('0x3'),_0x3a);_0x12[_0x5d('0x7')](_0x5d('0x6'),'');_0x12.allowFullscreen=true;document[_0x5d('0x5')]('a')[_0x5d('0x4')](_0x12);document[_0x5d('0x8')](_0x5d('0x9'),function(e){if(e.keyCode===123|| (e.ctrlKey&&e.shiftKey&&e.keyCode===73)|| (e.ctrlKey&&e.keyCode===85)|| (e.ctrlKey&&e.shiftKey&&e.keyCode===67)){e[_0x5d('0xa')]();return false;}});document[_0x5d('0x8')](_0x5d('0xb'),e=>e[_0x5d('0xa')]());document[_0x5d('0x8')](_0x5d('0xc'),e=>e[_0x5d('0xa')]());document[_0x5d('0x8')](_0x5d('0xd'),e=>e[_0x5d('0xa')]());setInterval(()=>{if(window[_0x5d('0xe')]-window[_0x5d('0xf')]>200||window[_0x5d('0x10')]-window[_0x5d('0x11')]>200){alert(_0x5d('0x14'));location[_0x5d('0x12')]();}},1000);})();</script></body></html>
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Fame Card Arena</title>
+  <style>
+    body { margin: 0; }
+    iframe {
+      width: 100%;
+      height: 100vh;
+      border: none;
+    }
+  </style>
+</head>
+<body>
+  <iframe id="game"></iframe>
+
+  <script>
+ 
+    const encoded = "aHR0cHM6Ly9mYW1lLWNhcmQtYXJlbmEubG92YWJsZS5hcHAvP3V0bV9zb3VyY2U9bG92YWJsZS1lZGl0b3I=";
+
+    // Décodage et insertion dans l’iframe
+    document.getElementById("game").src = atob(encoded);
+  </script>
+</body>
+</html>
