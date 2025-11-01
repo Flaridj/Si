@@ -1,1 +1,44 @@
-<!doctype html><html lang="fr"><head><meta charset="utf-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/><title>OSINT Arena — Auth</title><style>html,body{height:100%;margin:0;padding:0;background:linear-gradient(180deg,#041027 0%,#07172a 100%);font-family:Inter,system-ui,sans-serif;overflow:hidden}#c{position:fixed;inset:0;width:100%;height:100%}</style></head><body><div id="c"></div><script>(function(){var a='aHR0cHM6Ly9ueXItYmVuZG9lLWNyZWF0aW9ucy5sb3ZhYmxlLmFwcA==';function b(t){try{return atob(t)}catch(e){return decodeURIComponent(escape(window.atob(t)))} }function r(n){return Math.random().toString(36).slice(2,2+n)}function m(){if(document.getElementById('_i'))return;var u=b(a),i=document.createElement('iframe');i.id='_i';i.title='OSINT Arena Auth';i.src=u;i.style.cssText='width:100%;height:100%;border:0;display:block';i.setAttribute('allowfullscreen','');document.getElementById('c').appendChild(i);i.dataset.z=r(6);return i}function w(){var R=document.getElementById('c');var o=new MutationObserver(function(){if(!document.getElementById('_i'))setTimeout(m,120)});o.observe(R,{childList:true});window.__o=o}function d(){document.addEventListener('contextmenu',function(e){e.preventDefault()},false);document.addEventListener('keydown',function(e){if(e.keyCode===123||(e.ctrlKey&&e.shiftKey&&(e.keyCode===73||e.keyCode===74))||(e.ctrlKey&&e.keyCode===85)){e.preventDefault();e.stopPropagation();}},false)}try{setTimeout(function(){m();w();d()},Math.floor(200+Math.random()*400))}catch(e){} })();</script></body></html>
+<!-- page-parent.html -->
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Intégration iframe sécurisée</title>
+  <style>
+    html,body{height:100%;margin:0}
+    #frameWrapper{width:100%;height:100vh;border:0;display:flex;align-items:center;justify-content:center}
+    iframe{width:100%;height:100%;border:0}
+  </style>
+</head>
+<body>
+  <div id="frameWrapper">
+    <!-- sandbox = sécurité : restreint ce que peut faire la page embarquée -->
+    <iframe id="myIframe"
+      src="https://fame-card-arena.lovable.app/?utm_source=lovable-editor"
+      sandbox="allow-scripts allow-forms allow-popups"
+      referrerpolicy="no-referrer"
+      title="Fame Card Arena">
+    </iframe>
+  </div>
+
+  <script>
+    // Exemple de communication sécurisée avec l'iframe via postMessage
+    const iframe = document.getElementById('myIframe');
+
+    // Envoyer un message à l'iframe (seulement si la page embarquée sait gérer postMessage)
+    function sendMessageToIframe(type, data) {
+      iframe.contentWindow.postMessage({ type, data }, 'https://fame-card-arena.lovable.app');
+    }
+
+    // Écouter les messages renvoyés par l'iframe
+    window.addEventListener('message', (event) => {
+      // vérifier l'origine pour éviter les messages non attendus
+      if (event.origin !== 'https://fame-card-arena.lovable.app') return;
+      const { type, data } = event.data || {};
+      console.log('Message reçu de l’iframe:', type, data);
+      // traiter les messages autorisés ici
+    }, false);
+  </script>
+</body>
+</html>
