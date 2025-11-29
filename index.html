@@ -1,24 +1,37 @@
-<style>
-  html, body {
-    margin: 0;
-    padding: 0;
-    height: 100%;
-  }
-  .iframe-fullscreen {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100vw;
-    height: 100vh;
-    border: none;
-    margin: 0;
-    padding: 0;
-    overflow: hidden;
-    z-index: 9999;
-  }
-</style>
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <title>Wrapper ESR</title>
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      overflow: hidden;
+    }
+    iframe {
+      width: 100%;
+      height: 100%;
+      border: none;
+    }
+  </style>
+</head>
+<body>
 
-<iframe 
-  src="https://retro-stream-control.lovable.app"
-  class="iframe-fullscreen">
-</iframe>
+  <!-- WRAP DU SITE AVEC TOUS SES ENDPOINTS INTERNES -->
+  <iframe src="https://retro-stream-control.lovable.app/"></iframe>
+
+  <script>
+    // Optionnel : blocage léger de F12 (jamais invincible)
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "F12" || (e.ctrlKey && e.shiftKey && e.key === "I")) {
+        e.preventDefault();
+      }
+    });
+
+    document.addEventListener("contextmenu", (e) => e.preventDefault());
+  </script>
+
+</body>
+</html>
